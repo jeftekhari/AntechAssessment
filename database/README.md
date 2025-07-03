@@ -13,7 +13,7 @@ This database supports a DoD internal platform for managing user access requests
 - **Audit Entries**: Complete activity log for accountability
 
 ### Schema Diagram
-*[Schema diagram will be added here from Figma]*
+![image](https://github.com/user-attachments/assets/db170372-49d9-4486-addc-7331296d72e8)
 
 ## Table Relationships
 
