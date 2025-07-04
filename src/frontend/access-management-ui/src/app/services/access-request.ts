@@ -7,7 +7,7 @@ import { AccessRequest, SubmitAccessRequest, ReviewDecision } from '../models';
   providedIn: 'root'
 })
 export class AccessRequestService {
-  private baseUrl = 'http://localhost:5001/api/accessrequests';
+  private baseUrl = '/api/accessrequests';
 
   constructor(private http: HttpClient) { }
 
