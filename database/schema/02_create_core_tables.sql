@@ -20,8 +20,6 @@ CREATE TABLE roles (
     id INT PRIMARY KEY IDENTITY(1,1),
     role_name NVARCHAR(50) UNIQUE NOT NULL,
     description NVARCHAR(255),
-    hierarchy_level_id INT NOT NULL,
-    FOREIGN KEY (hierarchy_level_id) REFERENCES hierarchy_levels(id)
 );
 
 -- Junction table for many-to-many relationship between Users and Roles
@@ -79,7 +77,6 @@ CREATE TABLE audit_entries (
     timestamp_utc DATETIME2 DEFAULT GETUTCDATE(),
     
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (system_id) REFERENCES systems(id),
     FOREIGN KEY (access_request_id) REFERENCES access_requests(id)
 );
 
