@@ -249,21 +249,7 @@ docker exec -it access-management-db /opt/mssql-tools18/bin/sqlcmd -S localhost 
 ```
 
 ## Project Structure
-├── database/
-│ ├── init-db.sql # Database initialization script
-│ ├── schema/ # Database schema files
-│ └── seed-data/ # Database seed data files
-├── src/
-│ ├── services/
-│ │ ├── AccessRequest.Api/ # Access request management API
-│ │ ├── UserManagement.Api/ # User management API
-│ │ └── Common.Models/ # Shared models library
-│ └── frontend/
-│ └── access-management-ui/ # Angular frontend application
-├── docker-compose.yml # Docker services configuration
-├── Dockerfile # .NET API container definition
-└── README.md # 
-
+![image](https://github.com/user-attachments/assets/df3bfde9-985b-407a-86b0-45851347c784)
 
 ## Default Users
 
