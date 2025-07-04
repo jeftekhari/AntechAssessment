@@ -1,0 +1,42 @@
+<div class="pending-requests-container">
+    <h3>Pending Access Requests</h3>
+    
+    <div *ngIf="isLoading" class="loading">
+      Loading pending requests...
+    </div>
+  
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{errorMessage}}
+    </div>
+  
+    <div *ngIf="!isLoading && pendingRequests.length === 0" class="no-requests">
+      No pending requests found.
+    </div>
+  
+    <div *ngIf="!isLoading && pendingRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of pendingRequests" class="request-card">
+        <div class="request-header">
+          <h4>{{request.systemName}}</h4>
+          <span class="status-badge status-pending">{{request.status}}</span>
+        </div>
+        
+        <div class="request-details">
+          <p><strong>Classification:</strong> {{request.classificationLevel}}</p>
+          <p><strong>Requested:</strong> {{request.createdDate | date:'medium'}}</p>
+          <p><strong>Justification:</strong> {{request.justification}}</p>
+          <p *ngIf="request.requiresSpecialApproval" class="special-approval">
+            Requires Special Approval
+          </p>
+        </div>
+        
+        <div *ngIf="canApprove()" class="approval-actions">
+          <button class="btn btn-success" (click)="approveRequest(request.id)">
+            Approve
+          </button>
+          <button class="btn btn-danger" (click)="rejectRequest(request.id)">
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

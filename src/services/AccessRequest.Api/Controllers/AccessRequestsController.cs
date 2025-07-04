@@ -220,5 +220,39 @@ namespace AccessRequest.Api.Controllers
                 return StatusCode(500, $"Database error: {ex.Message}");
             }
         }
+
+        [HttpGet("pending")]
+        public async Task<ActionResult<IEnumerable<AccessRequestResponse>>> GetPendingRequestsByUserId(Guid userId)
+        {
+            try
+            {
+                using var connection = GetConnection();
+                var sql = @"
+                    SELECT 
+                        ar.id,
+                        ar.user_id as UserId,
+                        ar.system_id as SystemId,
+                        ar.justification as Justification,
+                        ar.status_id as StatusId,
+                        ar.created_date as CreatedDate,
+                        ar.reviewed_by as ReviewedBy,
+                        ar.reviewed_date as ReviewedDate,
+                        u.first_name + ' ' + u.last_name as UserName,
+                        s.system_name as SystemName,
+                        s.classification_level as ClassificationLevel,
+                        s.requires_special_approval as RequiresSpecialApproval
+                    FROM access_requests ar
+                    JOIN users u ON ar.user_id = u.id
+                    JOIN systems s ON ar.system_id = s.id
+                    WHERE ar.status_id = 1 AND ar.user_id = @UserId";
+
+                var requests = await connection.QueryAsync<AccessRequestResponse>(sql, new { UserId = userId });
+                return Ok(requests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Database error: {ex.Message}");
+            }
+        }
     }
 }

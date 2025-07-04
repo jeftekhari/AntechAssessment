@@ -7,6 +7,9 @@ export interface AccessRequest {
   createdDate: string;
   reviewedByName?: string;
   reviewedDate?: string;
+  systemID: number;
+  classificationLevel: string;
+  requiresSpecialApproval: boolean;
 }
 
 export interface SubmitAccessRequest {

@@ -1,0 +1,65 @@
+<div class="form-container">
+  <h2>Request System Access</h2>
+  
+  <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
+    
+    <div class="form-group">
+      <label for="systemId">Select System:</label>
+      <select 
+        id="systemId" 
+        formControlName="systemId" 
+        class="form-control"
+        [class.is-invalid]="requestForm.get('systemId')?.invalid && requestForm.get('systemId')?.touched">
+        
+        <option value="">Choose a system...</option>
+        <option *ngFor="let system of systems" [value]="system.id">
+          {{system.systemName}} - {{system.classificationLevel}}
+          <span *ngIf="system.requiresSpecialApproval">(Requires Special Approval)</span>
+        </option>
+      </select>
+      
+      <div *ngIf="requestForm.get('systemId')?.invalid && requestForm.get('systemId')?.touched" 
+           class="error-message">
+        Please select a system.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="justification">Justification (minimum 10 characters):</label>
+      <textarea 
+        id="justification"
+        formControlName="justification"
+        class="form-control"
+        rows="4"
+        placeholder="Explain why you need access to this system..."
+        [class.is-invalid]="requestForm.get('justification')?.invalid && requestForm.get('justification')?.touched">
+      </textarea>
+      
+      <div *ngIf="requestForm.get('justification')?.invalid && requestForm.get('justification')?.touched" 
+           class="error-message">
+        <div *ngIf="requestForm.get('justification')?.errors?.['required']">
+          Justification is required.
+        </div>
+        <div *ngIf="requestForm.get('justification')?.errors?.['minlength']">
+          Justification must be at least 10 characters long.
+        </div>
+      </div>
+    </div>
+
+    <button 
+      type="submit" 
+      class="btn btn-primary"
+      [disabled]="requestForm.invalid || isSubmitting">
+      <span *ngIf="isSubmitting">Submitting...</span>
+      <span *ngIf="!isSubmitting">Submit Request</span>
+    </button>
+  </form>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{successMessage}}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{errorMessage}}
+  </div>
+</div>
