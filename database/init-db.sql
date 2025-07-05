@@ -171,6 +171,7 @@ GO
 -- From seed-data/03_sample_systems.sql
 PRINT 'Inserting sample systems...';
 
+IF NOT EXISTS (SELECT * FROM systems WHERE system_name = 'JIRA')
 INSERT INTO systems (system_name, description, classification_level, requires_special_approval, is_active) VALUES
 ('JIRA', 'Issue tracking and project management system', 'Confidential', 0, 1),
 ('SharePoint Collaboration', 'Document management and team collaboration', 'Confidential', 0, 1),

@@ -20,4 +20,5 @@ export interface SubmitAccessRequest {
 
 export interface ReviewDecision {
   statusId: number;
+  reviewerId: string;
 }

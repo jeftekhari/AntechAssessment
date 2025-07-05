@@ -17,10 +17,10 @@
       <div *ngFor="let request of pendingRequests" class="request-card">
         <div class="request-header">
           <h4>{{request.systemName}}</h4>
-          <span class="status-badge status-pending">{{request.status}}</span>
         </div>
         
         <div class="request-details">
+          <p><strong>User:</strong> {{request.userName}}</p>
           <p><strong>Classification:</strong> {{request.classificationLevel}}</p>
           <p><strong>Requested:</strong> {{request.createdDate | date:'medium'}}</p>
           <p><strong>Justification:</strong> {{request.justification}}</p>

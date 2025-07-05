@@ -5,6 +5,8 @@ namespace AccessRequest.Api.Models
         public Guid Id { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string SystemName { get; set; } = string.Empty;
+        public string ClassificationLevel { get; set; } = string.Empty;
+        public bool RequiresSpecialApproval { get; set; }
         public string Justification { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }

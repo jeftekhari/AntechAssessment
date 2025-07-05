@@ -14,10 +14,10 @@ import { SubmitAccessRequest } from '../../models/access-request.model';
 export class UserRequestForm implements OnInit {
   requestForm: FormGroup;
   isSubmitting = false;
-  successMessage = 'Access request submitted successfully';
-  errorMessage = 'Failed to submit access request';
+  errorMessage = '';
+  successMessage = '';
 
-  systems: any[] = [];  // Array to hold available systems
+  systems: any[] = [];  
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +43,11 @@ export class UserRequestForm implements OnInit {
     ];
   }
 
+  isSystemAdministrator(): boolean {
+    const currentUser = this.authService.getCurrentUser();
+    return currentUser?.roleId === 3; 
+  }
+
   onSubmit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
@@ -62,12 +67,13 @@ export class UserRequestForm implements OnInit {
 
       this.accessRequestService.submitRequest(request).subscribe({
         next: (response) => {
-          this.successMessage = `${this.successMessage}: ${response.id}`;
+          this.successMessage = `Access request submitted successfully: ${response.id}`;
           this.requestForm.reset();
+          this.accessRequestService.notifyRequestSubmitted();
           this.isSubmitting = false;
         },
         error: (error) => {
-          this.errorMessage = `${this.errorMessage}: ${error.message}`;
+          this.errorMessage = `Failed to submit access request: ${error.message}`;
           this.isSubmitting = false;
         }
       });

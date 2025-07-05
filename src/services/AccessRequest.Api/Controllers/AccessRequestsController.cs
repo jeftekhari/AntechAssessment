@@ -160,9 +160,6 @@ namespace AccessRequest.Api.Controllers
             {
                 using var connection = GetConnection();
                 
-                // Define reviewer ID first (before authority checking)
-                var reviewerId = Guid.Parse("93ddf74a-260f-4a8e-a69c-2c5edda36936"); // Our test user
-                
                 // First, get the request and system details for authority checking
                 var requestCheckSql = @"
                     SELECT ar.id, ar.user_id as UserId, ar.system_id as SystemId, ar.status_id as StatusId,
@@ -184,7 +181,7 @@ namespace AccessRequest.Api.Controllers
                     JOIN roles r ON ur.role_id = r.id
                     WHERE ur.user_id = @ReviewerId AND ur.is_active = 1";
 
-                var reviewerHighestRoleId = await connection.QueryFirstOrDefaultAsync<int?>(reviewerRoleSql, new { ReviewerId = reviewerId });
+                var reviewerHighestRoleId = await connection.QueryFirstOrDefaultAsync<int?>(reviewerRoleSql, new { ReviewerId = decision.ReviewerId });
 
                 if (reviewerHighestRoleId == null || reviewerHighestRoleId < (int)RoleHierarchy.Admin)
                 {
@@ -208,7 +205,7 @@ namespace AccessRequest.Api.Controllers
                 
                 await connection.ExecuteAsync(updateSql, new { 
                     StatusId = decision.StatusId, 
-                    ReviewedBy = reviewerId, 
+                    ReviewedBy = decision.ReviewerId, 
                     Id = id 
                 });
                 
@@ -231,6 +228,7 @@ namespace AccessRequest.Api.Controllers
                     SELECT 
                         ar.id,
                         ar.user_id as UserId,
+                        ar.first_name + ' ' + ar.last_name as UserName,
                         ar.system_id as SystemId,
                         ar.justification as Justification,
                         ar.status_id as StatusId,
