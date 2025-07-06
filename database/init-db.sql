@@ -108,9 +108,11 @@ CREATE TABLE audit_entries (
     system_id INT NULL,  
     access_request_id UNIQUEIDENTIFIER NULL,  
     timestamp_utc DATETIME2 DEFAULT GETUTCDATE(),
+    performed_by UNIQUEIDENTIFIER NULL;
     
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (access_request_id) REFERENCES access_requests(id)
+    FOREIGN KEY (access_request_id) REFERENCES access_requests(id),
+    FOREIGN KEY (performed_by) REFERENCES users(id)
 );
 
 GO
@@ -200,8 +202,8 @@ INSERT INTO user_roles (user_id, role_id, assigned_by, is_active, assigned_date)
 
 GO
 
-ALTER TABLE audit_entries ADD performed_by UNIQUEIDENTIFIER NULL;
-ALTER TABLE audit_entries ADD FOREIGN KEY (performed_by) REFERENCES users(id);
+-- ALTER TABLE audit_entries ADD performed_by UNIQUEIDENTIFIER NULL;
+-- ALTER TABLE audit_entries ADD FOREIGN KEY (performed_by) REFERENCES users(id);
 
 PRINT 'Database initialization completed successfully.';
 PRINT 'Schema created: lookup tables, core tables, indexes';
