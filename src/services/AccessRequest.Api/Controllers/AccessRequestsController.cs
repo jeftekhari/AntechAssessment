@@ -12,10 +12,12 @@ namespace AccessRequest.Api.Controllers
     public class AccessRequestsController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public AccessRequestsController(IConfiguration configuration)
+        public AccessRequestsController(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
         }
 
         private IDbConnection GetConnection()
@@ -39,7 +41,6 @@ namespace AccessRequest.Api.Controllers
                 
                 var newRequest = await connection.QueryFirstAsync<AccessRequest.Api.Models.AccessRequest>(insertSql, request);
                 
-                // friendly response
                 var responseSql = @"
                     SELECT ar.id, 
                            u.first_name + ' ' + u.last_name as UserName,
@@ -55,6 +56,14 @@ namespace AccessRequest.Api.Controllers
                     WHERE ar.id = @Id";
                 
                 var response = await connection.QueryFirstAsync<AccessRequestResponse>(responseSql, new { Id = newRequest.Id });
+
+                await CreateAuditEntryAsync(
+                    userId: request.UserId,                     
+                    actionType: "Request Created",              
+                    systemId: request.SystemId,                 
+                    accessRequestId: newRequest.Id,             
+                    performedBy: request.UserId                 
+                );
                 
                 return CreatedAtAction(nameof(GetRequest), new { id = newRequest.Id }, response);
             }
@@ -114,7 +123,7 @@ namespace AccessRequest.Api.Controllers
                 var whereClause = "";
                 object parameters;
                 
-                // Optional filtering by status
+                // optional filtering by status
                 if (!string.IsNullOrEmpty(status))
                 {
                     whereClause = "WHERE rs.status_name = @Status";
@@ -160,21 +169,21 @@ namespace AccessRequest.Api.Controllers
             {
                 using var connection = GetConnection();
                 
-                // First, get the request and system details for authority checking
+                // get pending requests
                 var requestCheckSql = @"
                     SELECT ar.id, ar.user_id as UserId, ar.system_id as SystemId, ar.status_id as StatusId,
                            s.requires_special_approval as RequiresSpecialApproval,
                            s.system_name as SystemName
                     FROM access_requests ar
                     JOIN systems s ON ar.system_id = s.id
-                    WHERE ar.id = @Id AND ar.status_id = 1"; // Only pending requests
+                    WHERE ar.id = @Id AND ar.status_id = 1"; 
                 
                 var requestInfo = await connection.QueryFirstOrDefaultAsync(requestCheckSql, new { Id = id });
                 
                 if (requestInfo == null)
                     return NotFound("Request not found or already reviewed");
                 
-                // Get the reviewer's highest role level
+                // get reviewer's highest role level
                 var reviewerRoleSql = @"
                     SELECT MAX(r.id) as HighestRoleId
                     FROM user_roles ur
@@ -188,14 +197,14 @@ namespace AccessRequest.Api.Controllers
                     return Forbid("Insufficient permissions to review requests");
                 }
 
-                // Check if system requires special approval
+                // check if system requires special approval
                 if (requestInfo.RequiresSpecialApproval && reviewerHighestRoleId < (int)RoleHierarchy.SystemAdministrator)
                 {
                     return BadRequest($"Request for {requestInfo.SystemName} requires System Administrator approval. " +
                                      "This request is outside the limits of your authority.");
                 }
                 
-                // Update the request status
+                // update request status
                 var updateSql = @"
                     UPDATE access_requests 
                     SET status_id = @StatusId, 
@@ -208,8 +217,26 @@ namespace AccessRequest.Api.Controllers
                     ReviewedBy = decision.ReviewerId, 
                     Id = id 
                 });
+
+                //audit log
+                string actionType = decision.StatusId == 2 ? "Request Approved" : "Request Rejected";
+                await CreateAuditEntryAsync(
+                    userId: (Guid)requestInfo.UserId,           
+                    actionType: actionType,                     
+                    systemId: (int)requestInfo.SystemId,        
+                    accessRequestId: id,                        
+                    performedBy: decision.ReviewerId            
+                );
+
+                //assuming email service is available via API
+                // I would add a Service/EmailService.cs to handle the email sending
+
+                // await SendEmailNotificationAsync(
+                //     requestInfo: requestInfo,
+                //     decision: decision
+                //     actionType: actionType
+                // );
                 
-                // Get the updated request for response
                 return await GetRequest(id);
             }
             catch (Exception ex)
@@ -250,6 +277,33 @@ namespace AccessRequest.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Database error: {ex.Message}");
+            }
+        }
+
+        private async Task CreateAuditEntryAsync(Guid userId, string actionType, int? systemId, Guid? accessRequestId, Guid? performedBy)
+        {
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient("AuditApi");
+                
+                var auditRequest = new CreateAuditEntryRequest
+                {
+                    UserId = userId,
+                    ActionType = actionType,
+                    SystemId = systemId,
+                    AccessRequestId = accessRequestId,
+                    PerformedBy = performedBy
+                };
+
+                var response = await httpClient.PostAsJsonAsync("api/audit", auditRequest);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Failed to create audit entry: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating audit entry: {ex.Message}");
             }
         }
     }

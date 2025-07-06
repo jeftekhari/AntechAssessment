@@ -104,9 +104,9 @@ CREATE TABLE access_requests (
 CREATE TABLE audit_entries (
     id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     user_id UNIQUEIDENTIFIER NOT NULL,
-    action_type NVARCHAR(100) NOT NULL,  -- 'Request Created', 'Request Approved', etc.
-    system_id INT NULL,  -- Which system was affected (nullable for user actions)
-    access_request_id UNIQUEIDENTIFIER NULL,  -- Link to specific request if applicable
+    action_type NVARCHAR(100) NOT NULL,  
+    system_id INT NULL,  
+    access_request_id UNIQUEIDENTIFIER NULL,  
     timestamp_utc DATETIME2 DEFAULT GETUTCDATE(),
     
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -199,6 +199,9 @@ INSERT INTO user_roles (user_id, role_id, assigned_by, is_active, assigned_date)
 ('33333333-3333-3333-3333-333333333333', 3, '33333333-3333-3333-3333-333333333333', 1, GETDATE());  -- System Admin: SystemAdministrator
 
 GO
+
+ALTER TABLE audit_entries ADD performed_by UNIQUEIDENTIFIER NULL;
+ALTER TABLE audit_entries ADD FOREIGN KEY (performed_by) REFERENCES users(id);
 
 PRINT 'Database initialization completed successfully.';
 PRINT 'Schema created: lookup tables, core tables, indexes';
