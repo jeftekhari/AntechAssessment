@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { AccessRequest, SubmitAccessRequest, ReviewDecision } from '../models';
+import { AccessRequest, SubmitAccessRequest, ReviewDecision, System } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -44,5 +44,9 @@ export class AccessRequestService {
   // notify that a request was submitted
   notifyRequestSubmitted(): void {
     this.requestSubmittedSubject.next();
+  }
+
+  getSystems(): Observable<System[]> {
+    return this.http.get<System[]>(`${this.baseUrl}/systems`);
   }
 }

@@ -1,0 +1,20 @@
+{
+  "/api/accessrequests": {
+    "target": "http://localhost:5001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/users": {
+    "target": "http://localhost:5003", 
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/audit": {
+    "target": "http://localhost:5002",
+    "secure": false, 
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -1,4 +1,4 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 <!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
 <!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
 <!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
@@ -6,7 +6,7 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
+<!-- 
 <style>
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);
@@ -178,8 +178,8 @@
       background: var(--red-to-pink-to-purple-horizontal-gradient);
       margin-block: 1.5rem;
     }
-  }
-</style>
+  } -->
+<!-- </style> -->
 
 <app-user-switcher></app-user-switcher>
 
@@ -192,15 +192,10 @@
     <app-user-request-form></app-user-request-form>
     <app-pending-requests></app-pending-requests>
   </main>
+
+  <section *ngIf="isSystemAdministrator()" class="audit-section">
+    <app-audit-log></app-audit-log>
+  </section>
 </div>
-
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
 
 <router-outlet />

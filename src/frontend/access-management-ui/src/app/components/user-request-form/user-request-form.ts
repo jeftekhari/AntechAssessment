@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AccessRequestService } from '../../services/access-request';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth';
 import { SubmitAccessRequest } from '../../models/access-request.model';
 
 @Component({
@@ -35,12 +35,14 @@ export class UserRequestForm implements OnInit {
   }
 
   loadSystems() {
-    // For now, hardcode systems (later we'll create a systems service)
-    this.systems = [
-      { id: 1, systemName: 'JIRA', description: 'Issue tracking and project management', classificationLevel: 'Confidential', requiresSpecialApproval: false, isActive: true, createdDate: '' },
-      { id: 2, systemName: 'SharePoint Collaboration', description: 'Document management and team collaboration', classificationLevel: 'Confidential', requiresSpecialApproval: false, isActive: true, createdDate: '' },
-      { id: 3, systemName: 'Database Admin Tools', description: 'Administrative access to production databases', classificationLevel: 'Secret', requiresSpecialApproval: true, isActive: true, createdDate: '' }
-    ];
+    this.accessRequestService.getSystems().subscribe({
+      next: (systems) => {
+        this.systems = systems;
+      },
+      error: (error) => {
+        console.error('Error loading systems:', error);
+      }
+    });
   }
 
   isSystemAdministrator(): boolean {

@@ -1,0 +1,55 @@
+.audit-log-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.audit-log-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  margin-top: 20px;
+}
+
+.audit-table {
+  width: 100%;
+}
+
+.action-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.action-request-created {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.action-request-approved {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.action-request-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService, User } from '../../services/auth.service';
+import { AuthService, User } from '../../services/auth';
 
 @Component({
   selector: 'app-user-switcher',

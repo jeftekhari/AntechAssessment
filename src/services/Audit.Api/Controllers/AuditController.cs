@@ -60,7 +60,8 @@ namespace Audit.Api.Controllers
                     FROM audit_entries ae
                     JOIN users u ON ae.user_id = u.id
                     LEFT JOIN users pu ON ae.performed_by = pu.id
-                    LEFT JOIN systems s ON ae.system_id = s.id
+                    LEFT JOIN access_requests ar ON ae.access_request_id = ar.id
+                    LEFT JOIN systems s ON ar.system_id = s.id
                     ORDER BY ae.timestamp_utc DESC";
                 
                 var auditEntries = await connection.QueryAsync<AuditEntryResponse>(sql);
@@ -81,9 +82,9 @@ namespace Audit.Api.Controllers
                 
                 // Insert the audit entry
                 var insertSql = @"
-                    INSERT INTO audit_entries (user_id, action_type, system_id, access_request_id, performed_by, timestamp_utc)
+                    INSERT INTO audit_entries (user_id, action_type, access_request_id, performed_by, timestamp_utc)
                     OUTPUT INSERTED.id
-                    VALUES (@UserId, @ActionType, @SystemId, @AccessRequestId, @PerformedBy, GETUTCDATE())";
+                    VALUES (@UserId, @ActionType, @AccessRequestId, @PerformedBy, GETUTCDATE())";
                 
                 var newAuditEntryId = await connection.QueryFirstAsync<Guid>(insertSql, request);
                 
@@ -104,7 +105,8 @@ namespace Audit.Api.Controllers
                     FROM audit_entries ae
                     JOIN users u ON ae.user_id = u.id
                     LEFT JOIN users pu ON ae.performed_by = pu.id
-                    LEFT JOIN systems s ON ae.system_id = s.id
+                    LEFT JOIN access_requests ar ON ae.access_request_id = ar.id
+                    LEFT JOIN systems s ON ar.system_id = s.id
                     WHERE ae.id = @Id";
                 
                 var response = await connection.QueryFirstAsync<AuditEntryResponse>(selectSql, new { Id = newAuditEntryId });

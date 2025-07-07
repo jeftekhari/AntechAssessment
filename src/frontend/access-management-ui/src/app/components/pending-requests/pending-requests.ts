@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AccessRequestService } from '../../services/access-request';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth';
 import { AccessRequest } from '../../models/access-request.model';
 
 @Component({
@@ -34,6 +34,14 @@ export class PendingRequestsComponent implements OnInit, OnDestroy {
         this.errorMessage = 'No user logged in';
       }
     });
+
+    // Fallback: Check for current user after subscription setup
+    setTimeout(() => {
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser && this.pendingRequests.length === 0 && !this.isLoading) {
+        this.loadPendingRequests();
+      }
+    }, 0);
 
     //listen on submit
     this.requestSubmittedSubscription = this.accessRequestService.requestSubmitted$.subscribe(() => {
@@ -122,8 +130,7 @@ export class PendingRequestsComponent implements OnInit, OnDestroy {
       }).subscribe({
         next: (updatedRequest) => {
           this.pendingRequests = this.pendingRequests.filter(r => r.id !== id);
-          console.log('Request approved:', updatedRequest);
-          this.errorMessage = ''; // Clear errors
+          this.errorMessage = '';
         },
         error: (error) => {
           console.error('Error approving request:', error);
@@ -147,8 +154,7 @@ export class PendingRequestsComponent implements OnInit, OnDestroy {
       }).subscribe({
         next: (updatedRequest) => {
           this.pendingRequests = this.pendingRequests.filter(r => r.id !== id);
-          console.log('Request rejected:', updatedRequest);
-          this.errorMessage = ''; // Clear errors
+          this.errorMessage = '';
         },
         error: (error) => {
           console.error('Error rejecting request:', error);

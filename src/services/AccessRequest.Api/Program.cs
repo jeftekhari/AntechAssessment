@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -11,22 +10,28 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient("AuditApi", client =>
 {
-    client.BaseAddress = new Uri("http://audit-api:5002/"); //docker audit
+    var auditApiUrl = builder.Environment.IsDevelopment() 
+        ? "http://localhost:5002/"
+        : "http://audit-api:5002/";
+    
+    client.BaseAddress = new Uri(auditApiUrl);
 });
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")  // angluar dev
+        policy.WithOrigins("http://localhost:4200")  
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+Console.WriteLine($"IsDevelopment: {builder.Environment.IsDevelopment()}");
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

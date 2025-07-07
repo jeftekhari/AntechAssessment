@@ -15,10 +15,6 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-
-  // Mock users matching our database seed data
   private mockUsers: User[] = [
     {
       id: '11111111-1111-1111-1111-111111111111',
@@ -49,9 +45,10 @@ export class AuthService {
     }
   ];
 
+  private currentUserSubject = new BehaviorSubject<User | null>(this.mockUsers[0]);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
   constructor() {
-    // Start with the first user (regular user) for demo purposes
-    this.currentUserSubject.next(this.mockUsers[0]);
   }
 
   getCurrentUser(): User | null {

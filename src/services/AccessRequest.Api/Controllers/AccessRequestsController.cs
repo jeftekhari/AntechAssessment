@@ -139,6 +139,7 @@ namespace AccessRequest.Api.Controllers
                            ar.justification,
                            rs.status_name as Status,
                            ar.created_date as CreatedDate,
+                           s.classification_level as ClassificationLevel,
                            CASE 
                                WHEN ar.reviewed_by IS NOT NULL 
                                THEN ru.first_name + ' ' + ru.last_name 
@@ -255,7 +256,6 @@ namespace AccessRequest.Api.Controllers
                     SELECT 
                         ar.id,
                         ar.user_id as UserId,
-                        ar.first_name + ' ' + ar.last_name as UserName,
                         ar.system_id as SystemId,
                         ar.justification as Justification,
                         ar.status_id as StatusId,
@@ -280,6 +280,34 @@ namespace AccessRequest.Api.Controllers
             }
         }
 
+        [HttpGet("systems")]
+        public async Task<ActionResult<IEnumerable<AccessRequest.Api.Models.System>>> GetActiveSystems()
+        {
+            try
+            {
+                using var connection = GetConnection();
+                var sql = @"
+                    SELECT 
+                        id,
+                        system_name as SystemName,
+                        description,
+                        classification_level as ClassificationLevel,
+                        requires_special_approval as RequiresSpecialApproval,
+                        is_active as IsActive,
+                        created_date as CreatedDate
+                    FROM systems 
+                    WHERE is_active = 1
+                    ORDER BY system_name";
+                
+                var systems = await connection.QueryAsync<AccessRequest.Api.Models.System>(sql);
+                return Ok(systems);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Database error: {ex.Message}");
+            }
+        }
+
         private async Task CreateAuditEntryAsync(Guid userId, string actionType, int? systemId, Guid? accessRequestId, Guid? performedBy)
         {
             try
@@ -290,7 +318,6 @@ namespace AccessRequest.Api.Controllers
                 {
                     UserId = userId,
                     ActionType = actionType,
-                    SystemId = systemId,
                     AccessRequestId = accessRequestId,
                     PerformedBy = performedBy
                 };
