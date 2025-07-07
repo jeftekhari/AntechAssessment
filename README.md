@@ -25,8 +25,8 @@ A microservices-based web application for managing user access requests and audi
 
 ### 1. Clone and Start
 ```bash
-git clone <repository-url>
-cd "Pseudocode Exercise"
+git clone https://github.com/jeftekhari/AntechAssessment.git
+cd "AntechAssessment"
 
 # Build and start all services
 docker-compose up --build
